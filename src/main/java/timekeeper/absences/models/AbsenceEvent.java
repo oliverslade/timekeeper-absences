@@ -26,4 +26,10 @@ public class AbsenceEvent {
 
   @Column(name = "user_id")
   private Long userId;
+
+  @Column(name = "event_type")
+  private EventType eventType;
+
+  @Column
+  private Absence absenceDetails;
 }
