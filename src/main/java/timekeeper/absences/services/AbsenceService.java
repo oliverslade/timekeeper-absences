@@ -53,6 +53,20 @@ public class AbsenceService {
     return Optional.of(absenceRepository.save(absenceToApprove.get()));
   }
 
+  public Optional<Absence> updateAbsence(
+      long absenceId, LocalDate startDate, LocalDate endDate, String description) {
+    Optional<Absence> absenceToUpdate = absenceRepository.findById(absenceId);
+    
+    if (!absenceToUpdate.isPresent()) return absenceToUpdate;
+    Absence confirmedAbsence = absenceToUpdate.get();
+
+    confirmedAbsence.setStartDate(startDate);
+    confirmedAbsence.setEndDate(endDate);
+    confirmedAbsence.setDescription(description);
+
+    return Optional.of(absenceRepository.save(confirmedAbsence));
+  }
+
   /**
    * This setter method should be used only by unit tests.
    *
