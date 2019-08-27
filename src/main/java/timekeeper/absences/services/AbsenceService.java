@@ -2,11 +2,15 @@ package timekeeper.absences.services;
 
 import static java.util.Collections.EMPTY_LIST;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import timekeeper.absences.models.Absence;
+import timekeeper.absences.models.AbsenceEvent;
+import timekeeper.absences.models.EventType;
 import timekeeper.absences.repositories.AbsenceEventRepository;
 import timekeeper.absences.repositories.AbsenceRepository;
 
@@ -32,7 +36,10 @@ public class AbsenceService {
 
   public Absence createAbsence(
       long userId, LocalDate startDate, LocalDate endDate, String description) {
-    return null;
+    ArrayList<AbsenceEvent> createEvent = new ArrayList<>();
+    createEvent.add(new AbsenceEvent((long) 0, DateTime.now(), userId, EventType.CREATE));
+    Absence absenceToSave = new Absence((long) 0, userId, startDate, endDate, description, createEvent);
+    return absenceRepository.save(absenceToSave);
   }
 
   /**

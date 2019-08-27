@@ -18,7 +18,7 @@ public class TestUtils {
 
   public static Absence getDefaultAbsence(long id, DateTime timestamp) {
     List<AbsenceEvent> absenceEventList = new ArrayList<>();
-    absenceEventList.add(getDefaultAbsenceEvent(1234, CREATE, timestamp));
+    absenceEventList.add(getDefaultAbsenceEvent(id, CREATE, timestamp));
     return new Absence(
         id,
         (long) 1234,

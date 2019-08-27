@@ -1,6 +1,7 @@
 package timekeeper.absences.services;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -106,8 +107,8 @@ public class AbsenceServiceTests {
   @Test
   public void createAbsence_successful() {
     Absence expectedAbsence =
-        TestUtils.getDefaultAbsence(1234, LocalDate.now().toDateTimeAtStartOfDay());
-    when(mockAbsenceRepository.save(expectedAbsence)).thenReturn(expectedAbsence);
+        TestUtils.getDefaultAbsence(0, LocalDate.now().toDateTimeAtStartOfDay());
+    when(mockAbsenceRepository.save(any())).thenReturn(expectedAbsence);
 
     Absence actualAbsence =
         absenceService.createAbsence(

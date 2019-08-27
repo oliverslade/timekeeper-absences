@@ -16,7 +16,7 @@ public class Absence {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private long absenceId;
+  private Long absenceId;
 
   @Column(name = "user_id", updatable = false, nullable = false)
   private Long userId;
