@@ -16,6 +16,8 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import timekeeper.absences.models.Absence;
+import timekeeper.absences.models.AbsenceEvent;
+import timekeeper.absences.models.EventType;
 import timekeeper.absences.repositories.AbsenceRepository;
 import timekeeper.absences.utils.TestUtils;
 
@@ -118,5 +120,42 @@ public class AbsenceServiceTests {
             expectedAbsence.getDescription());
 
     assertEquals(expectedAbsence, actualAbsence);
+  }
+
+  @Test
+  public void approveAbsence_successful() {
+    Absence expectedAbsence =
+        TestUtils.getDefaultAbsence(0, LocalDate.now().toDateTimeAtStartOfDay());
+
+    Absence updatedAbsence =
+        new Absence(
+            expectedAbsence.getAbsenceId(),
+            expectedAbsence.getUserId(),
+            expectedAbsence.getStartDate(),
+            expectedAbsence.getEndDate(),
+            expectedAbsence.getDescription(),
+            expectedAbsence.getAbsenceEvents());
+    updatedAbsence
+        .getAbsenceEvents()
+        .add(new AbsenceEvent((long) 0, DateTime.now(), (long) 1234, EventType.APPROVE));
+
+    when(mockAbsenceRepository.findById(expectedAbsence.getAbsenceId()))
+        .thenReturn(Optional.of(expectedAbsence));
+    when(mockAbsenceRepository.save(any())).thenReturn(updatedAbsence);
+
+    Absence actualAbsence = absenceService.approveAbsence(expectedAbsence.getAbsenceId(), (long) 1234).get();
+
+    assertEquals(expectedAbsence, actualAbsence);
+  }
+
+  @Test
+  public void approveAbsence_notFound() {
+    long absenceId = 1234;
+    long approverId = 123;
+    when(mockAbsenceRepository.findById(absenceId)).thenReturn(Optional.empty());
+
+    Optional<Absence> actualAbsence = absenceService.approveAbsence(absenceId, approverId);
+
+    assertEquals(Optional.empty(), actualAbsence);
   }
 }

@@ -38,8 +38,19 @@ public class AbsenceService {
       long userId, LocalDate startDate, LocalDate endDate, String description) {
     ArrayList<AbsenceEvent> createEvent = new ArrayList<>();
     createEvent.add(new AbsenceEvent((long) 0, DateTime.now(), userId, EventType.CREATE));
-    Absence absenceToSave = new Absence((long) 0, userId, startDate, endDate, description, createEvent);
+    Absence absenceToSave =
+        new Absence((long) 0, userId, startDate, endDate, description, createEvent);
     return absenceRepository.save(absenceToSave);
+  }
+
+  public Optional<Absence> approveAbsence(long absenceId, long approverId) {
+    Optional<Absence> absenceToApprove = absenceRepository.findById(absenceId);
+    if (!absenceToApprove.isPresent()) return absenceToApprove;
+    absenceToApprove
+        .get()
+        .getAbsenceEvents()
+        .add(new AbsenceEvent((long) 0, DateTime.now(), approverId, EventType.APPROVE));
+    return Optional.of(absenceRepository.save(absenceToApprove.get()));
   }
 
   /**
