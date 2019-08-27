@@ -8,6 +8,7 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import timekeeper.absences.models.Absence;
 import timekeeper.absences.models.AbsenceEvent;
+import timekeeper.absences.models.AbsenceType;
 import timekeeper.absences.models.EventType;
 
 public class TestUtils {
@@ -22,6 +23,7 @@ public class TestUtils {
     return new Absence(
         id,
         (long) 1234,
+        AbsenceType.VACATION,
         new LocalDate(2019, 8, 1),
         new LocalDate(2019, 8, 5),
         "Holiday",

@@ -21,6 +21,9 @@ public class Absence {
   @Column(name = "user_id", updatable = false, nullable = false)
   private Long userId;
 
+  @Column(name = "absence_type", updatable = false, nullable = false)
+  private AbsenceType absenceType;
+
   @Column(name = "start_date", nullable = false)
   private LocalDate startDate;
 

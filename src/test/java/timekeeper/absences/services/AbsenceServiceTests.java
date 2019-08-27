@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static timekeeper.absences.utils.TestUtils.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -19,7 +20,6 @@ import timekeeper.absences.models.Absence;
 import timekeeper.absences.models.AbsenceEvent;
 import timekeeper.absences.models.EventType;
 import timekeeper.absences.repositories.AbsenceRepository;
-import timekeeper.absences.utils.TestUtils;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -40,7 +40,7 @@ public class AbsenceServiceTests {
   @Test
   public void getAllAbsencesByUser_successful() {
     long userId = 1234;
-    List<Absence> expectedAbsenceList = TestUtils.getDefaultAbsences();
+    List<Absence> expectedAbsenceList = getDefaultAbsences();
     when(mockAbsenceRepository.getAllByUserId(userId)).thenReturn(Optional.of(expectedAbsenceList));
 
     List actualAbsenceList = absenceService.getAllAbsencesByUser(userId);
@@ -60,7 +60,7 @@ public class AbsenceServiceTests {
   @Test
   public void getAbsenceDetails_successful() {
     long absenceId = 1234;
-    Absence expectedAbsence = TestUtils.getDefaultAbsence(absenceId, DateTime.now());
+    Absence expectedAbsence = getDefaultAbsence(absenceId, DateTime.now());
     when(mockAbsenceRepository.findById(absenceId)).thenReturn(Optional.of(expectedAbsence));
 
     Optional<Absence> actualAbsence = absenceService.getAbsenceDetails(absenceId);
@@ -82,7 +82,7 @@ public class AbsenceServiceTests {
   public void getAbsencesForPeriod_successful() {
     long userId = 1234;
     LocalDate startOfPeriod = new LocalDate(1564617600);
-    List<Absence> expectedAbsenceList = TestUtils.getDefaultAbsences();
+    List<Absence> expectedAbsenceList = getDefaultAbsences();
     when(mockAbsenceRepository.getAbsencesByStartDateBetweenAndUserId(
             startOfPeriod, startOfPeriod, userId))
         .thenReturn(Optional.of(expectedAbsenceList));
@@ -108,13 +108,13 @@ public class AbsenceServiceTests {
 
   @Test
   public void createAbsence_successful() {
-    Absence expectedAbsence =
-        TestUtils.getDefaultAbsence(0, LocalDate.now().toDateTimeAtStartOfDay());
+    Absence expectedAbsence = getDefaultAbsence(0, LocalDate.now().toDateTimeAtStartOfDay());
     when(mockAbsenceRepository.save(any())).thenReturn(expectedAbsence);
 
     Absence actualAbsence =
         absenceService.createAbsence(
             expectedAbsence.getUserId(),
+            expectedAbsence.getAbsenceType(),
             expectedAbsence.getStartDate(),
             expectedAbsence.getEndDate(),
             expectedAbsence.getDescription());
@@ -124,13 +124,13 @@ public class AbsenceServiceTests {
 
   @Test
   public void approveAbsence_successful() {
-    Absence expectedAbsence =
-        TestUtils.getDefaultAbsence(0, LocalDate.now().toDateTimeAtStartOfDay());
+    Absence expectedAbsence = getDefaultAbsence(0, LocalDate.now().toDateTimeAtStartOfDay());
 
     Absence updatedAbsence =
         new Absence(
             expectedAbsence.getAbsenceId(),
             expectedAbsence.getUserId(),
+            expectedAbsence.getAbsenceType(),
             expectedAbsence.getStartDate(),
             expectedAbsence.getEndDate(),
             expectedAbsence.getDescription(),
@@ -162,13 +162,13 @@ public class AbsenceServiceTests {
 
   @Test
   public void updateAbsence_successful() {
-    Absence expectedAbsence =
-        TestUtils.getDefaultAbsence(0, LocalDate.now().toDateTimeAtStartOfDay());
+    Absence expectedAbsence = getDefaultAbsence(0, LocalDate.now().toDateTimeAtStartOfDay());
 
     Absence updatedAbsence =
         new Absence(
             expectedAbsence.getAbsenceId(),
             expectedAbsence.getUserId(),
+            expectedAbsence.getAbsenceType(),
             expectedAbsence.getStartDate(),
             expectedAbsence.getEndDate(),
             expectedAbsence.getDescription(),
@@ -196,7 +196,7 @@ public class AbsenceServiceTests {
 
   @Test
   public void updateAbsence_notFound() {
-    Absence absence = TestUtils.getDefaultAbsence((long) 1234, DateTime.now());
+    Absence absence = getDefaultAbsence((long) 1234, DateTime.now());
     when(mockAbsenceRepository.findById(absence.getAbsenceId())).thenReturn(Optional.empty());
 
     Optional<Absence> actualAbsence =
