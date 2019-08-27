@@ -1,17 +1,16 @@
 package timekeeper.absences.models;
 
+import java.util.Date;
 import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.util.Date;
+import lombok.EqualsAndHashCode;
 
 @Data
 @Entity
-@Table(name = "absences")
-@NoArgsConstructor
+@Table(name = "absence_events")
 @AllArgsConstructor
+@EqualsAndHashCode
 public class AbsenceEvent {
 
   @Id
@@ -21,15 +20,13 @@ public class AbsenceEvent {
   @Column(name = "event_timestamp")
   private Date eventTimeStamp;
 
-  @Column(name = "absence_id")
-  private Long absenceId;
+  @ManyToOne
+  @JoinColumn(name = "absenceId")
+  private Absence absence;
 
   @Column(name = "user_id")
   private Long userId;
 
   @Column(name = "event_type")
   private EventType eventType;
-
-  @Column
-  private Absence absenceDetails;
 }

@@ -2,7 +2,7 @@ package timekeeper.absences.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import timekeeper.absences.models.Absence;
+import timekeeper.absences.models.AbsenceEvent;
 
 @Repository
-public interface AbsenceRepository extends JpaRepository<Absence, Long> {}
+public interface AbsenceEventRepository extends JpaRepository<AbsenceEvent, Long> {}

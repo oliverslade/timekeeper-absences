@@ -1,17 +1,28 @@
 package timekeeper.absences.models;
 
+import java.util.Date;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.util.Date;
+import lombok.EqualsAndHashCode;
 
 @Data
+@Entity
+@Table(name = "absences")
 @AllArgsConstructor
-class Absence {
+@EqualsAndHashCode
+public class Absence {
 
-    private Date startDate;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private long absenceId;
 
-    private Date endDate;
+  @Column(name = "start_date")
+  private Date startDate;
 
-    private String description;
+  @Column(name = "end_date")
+  private Date endDate;
+
+  @Column(name = "description")
+  private String description;
 }
