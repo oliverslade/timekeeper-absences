@@ -17,19 +17,12 @@ public class AbsenceEvent {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long eventId;
 
-  @Column(name = "event_timestamp")
+  @Column(name = "event_timestamp", updatable = false, nullable = false)
   private Date eventTimeStamp;
 
-  @Column(name = "user_created_by")
+  @Column(name = "user_created_by", updatable = false, nullable = false)
   private Long userCreatedBy;
 
-  @ManyToOne
-  @JoinColumn(name = "absenceId")
-  private Absence absence;
-
-  @Column(name = "user_id")
-  private Long userId;
-
-  @Column(name = "event_type")
+  @Column(name = "event_type", updatable = false, nullable = false)
   private EventType eventType;
 }
