@@ -20,6 +20,9 @@ public class AbsenceEvent {
   @Column(name = "event_timestamp")
   private Date eventTimeStamp;
 
+  @Column(name = "user_created_by")
+  private Long userCreatedBy;
+
   @ManyToOne
   @JoinColumn(name = "absenceId")
   private Absence absence;
