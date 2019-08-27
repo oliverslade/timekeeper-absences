@@ -5,9 +5,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,7 +57,7 @@ public class AbsenceServiceTests {
   @Test
   public void getAbsenceDetails_successful() {
     long absenceId = 1234;
-    Absence expectedAbsence = TestUtils.getDefaultAbsence(absenceId);
+    Absence expectedAbsence = TestUtils.getDefaultAbsence(absenceId, DateTime.now());
     when(mockAbsenceRepository.findById(absenceId)).thenReturn(Optional.of(expectedAbsence));
 
     Optional<Absence> actualAbsence = absenceService.getAbsenceDetails(absenceId);
@@ -77,7 +78,7 @@ public class AbsenceServiceTests {
   @Test
   public void getAbsencesForPeriod_successful() {
     long userId = 1234;
-    Date startOfPeriod = new Date(1564617600);
+    LocalDate startOfPeriod = new LocalDate(1564617600);
     List<Absence> expectedAbsenceList = TestUtils.getDefaultAbsences();
     when(mockAbsenceRepository.getAbsencesByStartDateBetweenAndUserId(
             startOfPeriod, startOfPeriod, userId))
@@ -91,7 +92,7 @@ public class AbsenceServiceTests {
   @Test
   public void getAbsencesForPeriod_empty() {
     long userId = 1234;
-    Date startOfPeriod = new Date(1564617600);
+    LocalDate startOfPeriod = new LocalDate(1564617600);
     List expectedAbsenceList = Collections.EMPTY_LIST;
     when(mockAbsenceRepository.getAbsencesByStartDateBetweenAndUserId(
             startOfPeriod, startOfPeriod, userId))
@@ -100,5 +101,21 @@ public class AbsenceServiceTests {
     List actualAbsenceList =
         absenceService.getAbsencesForPeriod(startOfPeriod, startOfPeriod, userId);
     assertEquals(expectedAbsenceList, actualAbsenceList);
+  }
+
+  @Test
+  public void createAbsence_successful() {
+    Absence expectedAbsence =
+        TestUtils.getDefaultAbsence(1234, LocalDate.now().toDateTimeAtStartOfDay());
+    when(mockAbsenceRepository.save(expectedAbsence)).thenReturn(expectedAbsence);
+
+    Absence actualAbsence =
+        absenceService.createAbsence(
+            expectedAbsence.getUserId(),
+            expectedAbsence.getStartDate(),
+            expectedAbsence.getEndDate(),
+            expectedAbsence.getDescription());
+
+    assertEquals(expectedAbsence, actualAbsence);
   }
 }

@@ -1,11 +1,11 @@
 package timekeeper.absences.models;
 
-import java.util.Date;
 import java.util.List;
 import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.joda.time.LocalDate;
 
 @Data
 @Entity
@@ -22,10 +22,10 @@ public class Absence {
   private Long userId;
 
   @Column(name = "start_date", nullable = false)
-  private Date startDate;
+  private LocalDate startDate;
 
   @Column(name = "end_date", nullable = false)
-  private Date endDate;
+  private LocalDate endDate;
 
   @Column(name = "description")
   private String description;

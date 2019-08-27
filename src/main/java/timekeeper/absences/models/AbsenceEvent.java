@@ -1,10 +1,10 @@
 package timekeeper.absences.models;
 
-import java.util.Date;
 import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.joda.time.DateTime;
 
 @Data
 @Entity
@@ -18,7 +18,7 @@ public class AbsenceEvent {
   private Long eventId;
 
   @Column(name = "event_timestamp", updatable = false, nullable = false)
-  private Date eventTimeStamp;
+  private DateTime eventTimeStamp;
 
   @Column(name = "user_created_by", updatable = false, nullable = false)
   private Long userCreatedBy;
