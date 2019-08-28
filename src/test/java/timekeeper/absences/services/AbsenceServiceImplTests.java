@@ -20,21 +20,22 @@ import timekeeper.absences.models.Absence;
 import timekeeper.absences.models.AbsenceEvent;
 import timekeeper.absences.models.EventType;
 import timekeeper.absences.repositories.AbsenceRepository;
+import timekeeper.absences.services.impls.AbsenceServiceImpl;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class AbsenceServiceTests {
+public class AbsenceServiceImplTests {
 
-  private AbsenceService absenceService;
+  private AbsenceServiceImpl absenceServiceImpl;
 
   private AbsenceRepository mockAbsenceRepository;
 
   @Before
   public void setUp() {
-    absenceService = new AbsenceService();
+    absenceServiceImpl = new AbsenceServiceImpl();
 
     mockAbsenceRepository = mock(AbsenceRepository.class);
-    absenceService.setAbsenceRepository(mockAbsenceRepository);
+    absenceServiceImpl.setAbsenceRepository(mockAbsenceRepository);
   }
 
   @Test
@@ -43,7 +44,7 @@ public class AbsenceServiceTests {
     List<Absence> expectedAbsenceList = getDefaultAbsences();
     when(mockAbsenceRepository.getAllByUserId(userId)).thenReturn(Optional.of(expectedAbsenceList));
 
-    List actualAbsenceList = absenceService.getAllAbsencesByUser(userId);
+    List actualAbsenceList = absenceServiceImpl.getAllAbsencesByUser(userId);
     assertEquals(expectedAbsenceList, actualAbsenceList);
   }
 
@@ -53,7 +54,7 @@ public class AbsenceServiceTests {
     List expectedAbsenceList = Collections.EMPTY_LIST;
     when(mockAbsenceRepository.getAllByUserId(userId)).thenReturn(Optional.empty());
 
-    List actualAbsenceList = absenceService.getAllAbsencesByUser(userId);
+    List actualAbsenceList = absenceServiceImpl.getAllAbsencesByUser(userId);
     assertEquals(expectedAbsenceList, actualAbsenceList);
   }
 
@@ -63,7 +64,7 @@ public class AbsenceServiceTests {
     Absence expectedAbsence = getDefaultAbsence(absenceId, DateTime.now());
     when(mockAbsenceRepository.findById(absenceId)).thenReturn(Optional.of(expectedAbsence));
 
-    Optional<Absence> actualAbsence = absenceService.getAbsenceDetails(absenceId);
+    Optional<Absence> actualAbsence = absenceServiceImpl.getAbsenceDetails(absenceId);
 
     assertEquals(expectedAbsence, actualAbsence.get());
   }
@@ -73,7 +74,7 @@ public class AbsenceServiceTests {
     long absenceId = 1234;
     when(mockAbsenceRepository.findById(absenceId)).thenReturn(Optional.empty());
 
-    Optional<Absence> actualAbsence = absenceService.getAbsenceDetails(absenceId);
+    Optional<Absence> actualAbsence = absenceServiceImpl.getAbsenceDetails(absenceId);
 
     assertEquals(Optional.empty(), actualAbsence);
   }
@@ -88,7 +89,7 @@ public class AbsenceServiceTests {
         .thenReturn(Optional.of(expectedAbsenceList));
 
     List actualAbsenceList =
-        absenceService.getAbsencesForPeriod(startOfPeriod, startOfPeriod, userId);
+        absenceServiceImpl.getAbsencesForPeriod(startOfPeriod, startOfPeriod, userId);
     assertEquals(expectedAbsenceList, actualAbsenceList);
   }
 
@@ -102,7 +103,7 @@ public class AbsenceServiceTests {
         .thenReturn(Optional.empty());
 
     List actualAbsenceList =
-        absenceService.getAbsencesForPeriod(startOfPeriod, startOfPeriod, userId);
+        absenceServiceImpl.getAbsencesForPeriod(startOfPeriod, startOfPeriod, userId);
     assertEquals(expectedAbsenceList, actualAbsenceList);
   }
 
@@ -112,7 +113,7 @@ public class AbsenceServiceTests {
     when(mockAbsenceRepository.save(any())).thenReturn(expectedAbsence);
 
     Absence actualAbsence =
-        absenceService.createAbsence(
+        absenceServiceImpl.createAbsence(
             expectedAbsence.getUserId(),
             expectedAbsence.getAbsenceType(),
             expectedAbsence.getStartDate(),
@@ -144,7 +145,7 @@ public class AbsenceServiceTests {
     when(mockAbsenceRepository.save(any())).thenReturn(updatedAbsence);
 
     Absence actualAbsence =
-        absenceService.approveAbsence(expectedAbsence.getAbsenceId(), (long) 1234).get();
+        absenceServiceImpl.approveAbsence(expectedAbsence.getAbsenceId(), (long) 1234).get();
 
     assertEquals(expectedAbsence, actualAbsence);
   }
@@ -155,7 +156,7 @@ public class AbsenceServiceTests {
     long approverId = 123;
     when(mockAbsenceRepository.findById(absenceId)).thenReturn(Optional.empty());
 
-    Optional<Absence> actualAbsence = absenceService.approveAbsence(absenceId, approverId);
+    Optional<Absence> actualAbsence = absenceServiceImpl.approveAbsence(absenceId, approverId);
 
     assertEquals(Optional.empty(), actualAbsence);
   }
@@ -183,7 +184,7 @@ public class AbsenceServiceTests {
     when(mockAbsenceRepository.save(any())).thenReturn(updatedAbsence);
 
     Absence actualAbsence =
-        absenceService
+        absenceServiceImpl
             .updateAbsence(
                 updatedAbsence.getAbsenceId(),
                 updatedAbsence.getStartDate(),
@@ -200,7 +201,7 @@ public class AbsenceServiceTests {
     when(mockAbsenceRepository.findById(absence.getAbsenceId())).thenReturn(Optional.empty());
 
     Optional<Absence> actualAbsence =
-        absenceService.updateAbsence(
+        absenceServiceImpl.updateAbsence(
             absence.getAbsenceId(),
             absence.getStartDate(),
             absence.getEndDate(),

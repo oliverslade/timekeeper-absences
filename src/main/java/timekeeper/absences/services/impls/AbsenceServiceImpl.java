@@ -1,4 +1,4 @@
-package timekeeper.absences.services;
+package timekeeper.absences.services.impls;
 
 import static java.util.Collections.EMPTY_LIST;
 
@@ -8,33 +8,40 @@ import java.util.Optional;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import timekeeper.absences.models.Absence;
 import timekeeper.absences.models.AbsenceEvent;
 import timekeeper.absences.models.AbsenceType;
 import timekeeper.absences.models.EventType;
 import timekeeper.absences.repositories.AbsenceEventRepository;
 import timekeeper.absences.repositories.AbsenceRepository;
+import timekeeper.absences.services.contracts.AbsenceService;
 
-public class AbsenceService {
+@Service
+public class AbsenceServiceImpl implements AbsenceService {
 
   @Autowired AbsenceRepository absenceRepository;
 
   @Autowired AbsenceEventRepository eventRepository;
 
+  @Override
   public List getAllAbsencesByUser(long userId) {
     return absenceRepository.getAllByUserId(userId).orElse(EMPTY_LIST);
   }
 
+  @Override
   public Optional<Absence> getAbsenceDetails(long absenceId) {
     return absenceRepository.findById(absenceId);
   }
 
+  @Override
   public List getAbsencesForPeriod(LocalDate startOfPeriod, LocalDate endOfPeriod, long userId) {
     return absenceRepository
         .getAbsencesByStartDateBetweenAndUserId(startOfPeriod, endOfPeriod, userId)
         .orElse(EMPTY_LIST);
   }
 
+  @Override
   public Absence createAbsence(
       long userId, AbsenceType type, LocalDate startDate, LocalDate endDate, String description) {
     ArrayList<AbsenceEvent> createEvent = new ArrayList<>();
@@ -44,6 +51,7 @@ public class AbsenceService {
     return absenceRepository.save(absenceToSave);
   }
 
+  @Override
   public Optional<Absence> approveAbsence(long absenceId, long approverId) {
     Optional<Absence> absenceToApprove = absenceRepository.findById(absenceId);
     if (!absenceToApprove.isPresent()) return absenceToApprove;
@@ -54,6 +62,7 @@ public class AbsenceService {
     return Optional.of(absenceRepository.save(absenceToApprove.get()));
   }
 
+  @Override
   public Optional<Absence> updateAbsence(
       long absenceId, LocalDate startDate, LocalDate endDate, String description) {
     Optional<Absence> absenceToUpdate = absenceRepository.findById(absenceId);
