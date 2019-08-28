@@ -1,6 +1,6 @@
 package timekeeper.absences.models;
 
-enum EventType {
+public enum EventType {
   CREATE,
   APPROVE,
   UPDATE,
