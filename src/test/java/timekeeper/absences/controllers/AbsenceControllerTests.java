@@ -221,7 +221,8 @@ public class AbsenceControllerTests {
   @Test(expected = ResponseStatusException.class)
   public void createAbsence_internalServerError() {
     Absence existingAbsence = TestUtils.getDefaultAbsence(123L, DateTime.now());
-    ResponseEntity expectedResponse = new ResponseEntity<>("something broke", HttpStatus.INTERNAL_SERVER_ERROR);
+    ResponseEntity expectedResponse =
+        new ResponseEntity<>("something broke", HttpStatus.INTERNAL_SERVER_ERROR);
 
     when(mockService.getAbsencesForPeriod(
             existingAbsence.getStartDate(),
@@ -288,12 +289,80 @@ public class AbsenceControllerTests {
   public void approveAbsence_internalServerError() {
     long absenceId = 123;
     long approverId = 321;
-    ResponseEntity expectedResponse = new ResponseEntity<>("something broke", HttpStatus.INTERNAL_SERVER_ERROR);
+    ResponseEntity expectedResponse =
+        new ResponseEntity<>("something broke", HttpStatus.INTERNAL_SERVER_ERROR);
 
     when(mockService.approveAbsence(absenceId, approverId))
-            .thenThrow(new RuntimeException("something broke"));
+        .thenThrow(new RuntimeException("something broke"));
 
     ResponseEntity actualResponse = controller.approveAbsence(absenceId, approverId);
+
+    assertEquals(expectedResponse, actualResponse);
+  }
+
+  @Test
+  public void updateAbsence_successful() {
+    Absence expectedAbsence = TestUtils.getDefaultAbsence(123L, DateTime.now());
+    ResponseEntity<Absence> expectedResponse = new ResponseEntity<>(expectedAbsence, HttpStatus.OK);
+
+    when(mockService.updateAbsence(
+            expectedAbsence.getAbsenceId(),
+            expectedAbsence.getStartDate(),
+            expectedAbsence.getEndDate(),
+            expectedAbsence.getDescription()))
+        .thenReturn(Optional.of(expectedAbsence));
+
+    ResponseEntity actualResponse =
+        controller.updateAbsence(
+            expectedAbsence.getAbsenceId(),
+            expectedAbsence.getStartDate(),
+            expectedAbsence.getEndDate(),
+            expectedAbsence.getDescription());
+
+    assertEquals(expectedResponse, actualResponse);
+  }
+
+  @Test
+  public void updateAbsence_notFound() {
+    Absence absenceDetails = TestUtils.getDefaultAbsence(123L, DateTime.now());
+    ResponseEntity expectedResponse = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+    when(mockService.updateAbsence(
+            absenceDetails.getAbsenceId(),
+            absenceDetails.getStartDate(),
+            absenceDetails.getEndDate(),
+            absenceDetails.getDescription()))
+        .thenReturn(Optional.empty());
+
+    ResponseEntity actualResponse =
+        controller.updateAbsence(
+            absenceDetails.getAbsenceId(),
+            absenceDetails.getStartDate(),
+            absenceDetails.getEndDate(),
+            absenceDetails.getDescription());
+
+    assertEquals(expectedResponse, actualResponse);
+  }
+
+  @Test(expected = ResponseStatusException.class)
+  public void updateAbsence_internalServerError() {
+    Absence absenceDetails = TestUtils.getDefaultAbsence(123L, DateTime.now());
+    ResponseEntity expectedResponse =
+        new ResponseEntity<>("something broke", HttpStatus.INTERNAL_SERVER_ERROR);
+
+    when(mockService.updateAbsence(
+            absenceDetails.getAbsenceId(),
+            absenceDetails.getStartDate(),
+            absenceDetails.getEndDate(),
+            absenceDetails.getDescription()))
+        .thenThrow(new RuntimeException("something broke"));
+
+    ResponseEntity actualResponse =
+        controller.updateAbsence(
+            absenceDetails.getAbsenceId(),
+            absenceDetails.getStartDate(),
+            absenceDetails.getEndDate(),
+            absenceDetails.getDescription());
 
     assertEquals(expectedResponse, actualResponse);
   }

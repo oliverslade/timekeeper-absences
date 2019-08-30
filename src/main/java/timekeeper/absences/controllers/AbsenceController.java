@@ -80,6 +80,19 @@ public class AbsenceController {
     }
   }
 
+  @PutMapping("/update-absence")
+  public ResponseEntity updateAbsence(
+      long absenceId, LocalDate startDate, LocalDate endDate, String description) {
+    try {
+      return absenceService
+          .updateAbsence(absenceId, startDate, endDate, description)
+          .map(absence -> new ResponseEntity<>(absence, OK))
+          .orElseGet(() -> new ResponseEntity<>(NOT_FOUND));
+    } catch (Exception e) {
+      throw new ResponseStatusException(INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
+    }
+  }
+
   /**
    * This setter method should be used only by unit tests.
    *

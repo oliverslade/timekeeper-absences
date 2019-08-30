@@ -4,7 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static timekeeper.absences.utils.TestUtils.*;
+import static timekeeper.absences.utils.TestUtils.getDefaultAbsence;
+import static timekeeper.absences.utils.TestUtils.getDefaultAbsences;
 
 import java.util.Collections;
 import java.util.List;
