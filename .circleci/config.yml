@@ -3,6 +3,10 @@ jobs:
   build:
     docker:
       - image: circleci/openjdk:11.0.3-jdk-stretch
+      - image: circleci/postgres:12-alpine
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: circle_test
 
     working_directory: ~/repo
 
