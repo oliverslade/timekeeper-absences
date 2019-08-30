@@ -1,7 +1,6 @@
 package timekeeper.absences.controllers;
 
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +19,18 @@ public class AbsenceController {
     try {
       return new ResponseEntity<>(absenceService.getAllAbsencesByUser(userId), OK);
     } catch (Exception e) {
+      throw new ResponseStatusException(INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
+    }
+  }
+
+  @GetMapping("/get-absences-details")
+  public ResponseEntity getAbsencesDetails(long absenceId) {
+    try {
+      return absenceService
+          .getAbsenceDetails(absenceId)
+          .map(absence -> new ResponseEntity<>(absence, OK))
+          .orElseGet(() -> new ResponseEntity<>(NOT_FOUND));
+    } catch (RuntimeException e) {
       throw new ResponseStatusException(INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
     }
   }

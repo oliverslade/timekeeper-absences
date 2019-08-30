@@ -7,6 +7,8 @@ import static org.mockito.Mockito.when;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,6 +36,41 @@ public class AbsenceControllerTests {
     controller = new AbsenceController();
     mockService = mock(AbsenceServiceImpl.class);
     controller.setService(mockService);
+  }
+
+  @Test
+  public void getAbsenceDetails_successful() {
+    Absence expectedAbsence = TestUtils.getDefaultAbsence(123L, DateTime.now());
+    ResponseEntity<Absence> expectedResponse = new ResponseEntity<>(expectedAbsence, HttpStatus.OK);
+    when(mockService.getAbsenceDetails(expectedAbsence.getAbsenceId()))
+        .thenReturn(Optional.of(expectedAbsence));
+
+    ResponseEntity<Absence> actualResponse =
+        controller.getAbsencesDetails(expectedAbsence.getAbsenceId());
+
+    assertEquals(expectedResponse, actualResponse);
+  }
+
+  @Test
+  public void getAbsenceDetails_notFound() {
+    long absenceId = 12345;
+    when(mockService.getAbsenceDetails(absenceId)).thenReturn(Optional.empty());
+
+    ResponseEntity actual = controller.getAbsencesDetails(absenceId);
+
+    assertEquals(HttpStatus.NOT_FOUND, actual.getStatusCode());
+  }
+
+  @Test(expected = ResponseStatusException.class)
+  public void getAbsenceDetails_internalServerError() {
+    long absenceId = 12345;
+    when(mockService.getAbsenceDetails(absenceId))
+        .thenThrow(new RuntimeException("something broke"));
+
+    ResponseEntity actual = controller.getAbsencesDetails(absenceId);
+
+    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, actual.getStatusCode());
+    assertEquals("something broke", Objects.requireNonNull(actual.getBody()).toString());
   }
 
   @Test
