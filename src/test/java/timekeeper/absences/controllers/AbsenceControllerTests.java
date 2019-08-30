@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -68,6 +69,50 @@ public class AbsenceControllerTests {
         .thenThrow(new RuntimeException("something broke"));
 
     ResponseEntity actual = controller.getAbsencesDetails(absenceId);
+
+    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, actual.getStatusCode());
+    assertEquals("something broke", Objects.requireNonNull(actual.getBody()).toString());
+  }
+
+  @Test
+  public void getAbsencesForPeriod_successful() {
+    LocalDate startDate = new LocalDate(2019, 8, 1);
+    LocalDate endDate = new LocalDate(2019, 8, 5);
+    long userId = 1234;
+    List<Absence> expectedAbsences = TestUtils.getDefaultAbsences();
+    ResponseEntity<List<Absence>> expectedResponse =
+        new ResponseEntity<>(expectedAbsences, HttpStatus.OK);
+    when(mockService.getAbsencesForPeriod(startDate, endDate, userId)).thenReturn(expectedAbsences);
+
+    ResponseEntity actualResponse = controller.getAbsencesForPeriod(startDate, endDate, userId);
+
+    assertEquals(expectedResponse, actualResponse);
+  }
+
+  @Test
+  public void getAbsencesForPeriod_noAbsences() {
+    LocalDate startDate = new LocalDate(2019, 8, 1);
+    LocalDate endDate = new LocalDate(2019, 8, 5);
+    long userId = 1234;
+    ResponseEntity<List<Absence>> expectedResponse =
+        new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
+    when(mockService.getAbsencesForPeriod(startDate, endDate, userId))
+        .thenReturn(Collections.emptyList());
+
+    ResponseEntity actualResponse = controller.getAbsencesForPeriod(startDate, endDate, userId);
+
+    assertEquals(expectedResponse, actualResponse);
+  }
+
+  @Test(expected = ResponseStatusException.class)
+  public void getAbsencesForPeriod_internalServerError() {
+    LocalDate startDate = new LocalDate(2019, 8, 1);
+    LocalDate endDate = new LocalDate(2019, 8, 5);
+    long userId = 1234;
+    when(mockService.getAbsencesForPeriod(startDate, endDate, userId))
+        .thenThrow(new RuntimeException("something broke"));
+
+    ResponseEntity actual = controller.getAbsencesForPeriod(startDate, endDate, userId);
 
     assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, actual.getStatusCode());
     assertEquals("something broke", Objects.requireNonNull(actual.getBody()).toString());

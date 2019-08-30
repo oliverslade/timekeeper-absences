@@ -2,6 +2,7 @@ package timekeeper.absences.controllers;
 
 import static org.springframework.http.HttpStatus.*;
 
+import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +31,17 @@ public class AbsenceController {
           .getAbsenceDetails(absenceId)
           .map(absence -> new ResponseEntity<>(absence, OK))
           .orElseGet(() -> new ResponseEntity<>(NOT_FOUND));
+    } catch (RuntimeException e) {
+      throw new ResponseStatusException(INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
+    }
+  }
+
+  @GetMapping("/get-absences-for-period")
+  public ResponseEntity getAbsencesForPeriod(
+      LocalDate startOfPeriod, LocalDate endOfPeriod, long userId) {
+    try {
+      return new ResponseEntity<>(
+          absenceService.getAbsencesForPeriod(startOfPeriod, endOfPeriod, userId), OK);
     } catch (RuntimeException e) {
       throw new ResponseStatusException(INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
     }
