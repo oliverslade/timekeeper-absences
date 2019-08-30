@@ -2,12 +2,16 @@ package timekeeper.absences.controllers;
 
 import static org.springframework.http.HttpStatus.*;
 
+import java.util.List;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import timekeeper.absences.models.Absence;
+import timekeeper.absences.models.AbsenceType;
 import timekeeper.absences.services.contracts.AbsenceService;
 
 @RestController
@@ -43,6 +47,19 @@ public class AbsenceController {
       return new ResponseEntity<>(
           absenceService.getAbsencesForPeriod(startOfPeriod, endOfPeriod, userId), OK);
     } catch (RuntimeException e) {
+      throw new ResponseStatusException(INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
+    }
+  }
+
+  @PostMapping("create-absence")
+  public ResponseEntity<Absence> createAbsence(
+      long userId, AbsenceType type, LocalDate startDate, LocalDate endDate, String description) {
+    try {
+      List existingAbsence = absenceService.getAbsencesForPeriod(startDate, endDate, userId);
+      if (!existingAbsence.isEmpty()) return new ResponseEntity<>(CONFLICT);
+      return new ResponseEntity<>(
+          absenceService.createAbsence(userId, type, startDate, endDate, description), OK);
+    } catch (Exception e) {
       throw new ResponseStatusException(INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
     }
   }

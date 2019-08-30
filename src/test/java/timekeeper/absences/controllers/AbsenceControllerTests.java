@@ -43,6 +43,7 @@ public class AbsenceControllerTests {
   public void getAbsenceDetails_successful() {
     Absence expectedAbsence = TestUtils.getDefaultAbsence(123L, DateTime.now());
     ResponseEntity<Absence> expectedResponse = new ResponseEntity<>(expectedAbsence, HttpStatus.OK);
+
     when(mockService.getAbsenceDetails(expectedAbsence.getAbsenceId()))
         .thenReturn(Optional.of(expectedAbsence));
 
@@ -55,6 +56,7 @@ public class AbsenceControllerTests {
   @Test
   public void getAbsenceDetails_notFound() {
     long absenceId = 12345;
+
     when(mockService.getAbsenceDetails(absenceId)).thenReturn(Optional.empty());
 
     ResponseEntity actual = controller.getAbsencesDetails(absenceId);
@@ -65,6 +67,7 @@ public class AbsenceControllerTests {
   @Test(expected = ResponseStatusException.class)
   public void getAbsenceDetails_internalServerError() {
     long absenceId = 12345;
+
     when(mockService.getAbsenceDetails(absenceId))
         .thenThrow(new RuntimeException("something broke"));
 
@@ -82,6 +85,7 @@ public class AbsenceControllerTests {
     List<Absence> expectedAbsences = TestUtils.getDefaultAbsences();
     ResponseEntity<List<Absence>> expectedResponse =
         new ResponseEntity<>(expectedAbsences, HttpStatus.OK);
+
     when(mockService.getAbsencesForPeriod(startDate, endDate, userId)).thenReturn(expectedAbsences);
 
     ResponseEntity actualResponse = controller.getAbsencesForPeriod(startDate, endDate, userId);
@@ -96,6 +100,7 @@ public class AbsenceControllerTests {
     long userId = 1234;
     ResponseEntity<List<Absence>> expectedResponse =
         new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
+
     when(mockService.getAbsencesForPeriod(startDate, endDate, userId))
         .thenReturn(Collections.emptyList());
 
@@ -109,6 +114,7 @@ public class AbsenceControllerTests {
     LocalDate startDate = new LocalDate(2019, 8, 1);
     LocalDate endDate = new LocalDate(2019, 8, 5);
     long userId = 1234;
+
     when(mockService.getAbsencesForPeriod(startDate, endDate, userId))
         .thenThrow(new RuntimeException("something broke"));
 
@@ -124,6 +130,7 @@ public class AbsenceControllerTests {
     long userId = 1234;
     ResponseEntity<List<Absence>> expectedResponse =
         new ResponseEntity<>(expectedAbsences, HttpStatus.OK);
+
     when(mockService.getAllAbsencesByUser(userId)).thenReturn(expectedAbsences);
 
     ResponseEntity actualResponse = controller.getAllAbsencesByUser(userId);
@@ -136,6 +143,7 @@ public class AbsenceControllerTests {
     long userId = 12345;
     ResponseEntity<List<Absence>> expectedResponse =
         new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
+
     when(mockService.getAllAbsencesByUser(userId)).thenReturn(Collections.emptyList());
 
     ResponseEntity actualResponse = controller.getAllAbsencesByUser(userId);
@@ -146,6 +154,7 @@ public class AbsenceControllerTests {
   @Test(expected = ResponseStatusException.class)
   public void getAllAbsencesByUser_internalServerError() {
     long userId = 12345;
+
     when(mockService.getAllAbsencesByUser(userId))
         .thenThrow(new RuntimeException("something broke"));
 
@@ -153,5 +162,79 @@ public class AbsenceControllerTests {
 
     assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, actual.getStatusCode());
     assertEquals("something broke", Objects.requireNonNull(actual.getBody()).toString());
+  }
+
+  @Test
+  public void createAbsence_successful() {
+    Absence expectedAbsence = TestUtils.getDefaultAbsence(123L, DateTime.now());
+    ResponseEntity<Absence> expectedResponse = new ResponseEntity<>(expectedAbsence, HttpStatus.OK);
+
+    when(mockService.getAbsencesForPeriod(
+            expectedAbsence.getStartDate(),
+            expectedAbsence.getEndDate(),
+            expectedAbsence.getUserId()))
+        .thenReturn(Collections.emptyList());
+
+    when(mockService.createAbsence(
+            expectedAbsence.getUserId(),
+            expectedAbsence.getAbsenceType(),
+            expectedAbsence.getStartDate(),
+            expectedAbsence.getEndDate(),
+            expectedAbsence.getDescription()))
+        .thenReturn(expectedAbsence);
+
+    ResponseEntity<Absence> actualResponse =
+        controller.createAbsence(
+            expectedAbsence.getUserId(),
+            expectedAbsence.getAbsenceType(),
+            expectedAbsence.getStartDate(),
+            expectedAbsence.getEndDate(),
+            expectedAbsence.getDescription());
+
+    assertEquals(expectedResponse, actualResponse);
+  }
+
+  @Test
+  public void createAbsence_alreadyExists() {
+    Absence existingAbsence = TestUtils.getDefaultAbsence(123L, DateTime.now());
+    ResponseEntity expectedResponse = new ResponseEntity<>(HttpStatus.CONFLICT);
+
+    when(mockService.getAbsencesForPeriod(
+            existingAbsence.getStartDate(),
+            existingAbsence.getEndDate(),
+            existingAbsence.getUserId()))
+        .thenReturn(Collections.singletonList(existingAbsence));
+
+    ResponseEntity actualResponse =
+        controller.createAbsence(
+            existingAbsence.getUserId(),
+            existingAbsence.getAbsenceType(),
+            existingAbsence.getStartDate(),
+            existingAbsence.getEndDate(),
+            existingAbsence.getDescription());
+
+    assertEquals(expectedResponse, actualResponse);
+  }
+
+  @Test(expected = ResponseStatusException.class)
+  public void createAbsence_internalServerError() {
+    Absence existingAbsence = TestUtils.getDefaultAbsence(123L, DateTime.now());
+    ResponseEntity expectedResponse = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+
+    when(mockService.getAbsencesForPeriod(
+            existingAbsence.getStartDate(),
+            existingAbsence.getEndDate(),
+            existingAbsence.getUserId()))
+        .thenThrow(new RuntimeException("something broke"));
+
+    ResponseEntity actualResponse =
+        controller.createAbsence(
+            existingAbsence.getUserId(),
+            existingAbsence.getAbsenceType(),
+            existingAbsence.getStartDate(),
+            existingAbsence.getEndDate(),
+            existingAbsence.getDescription());
+
+    assertEquals(expectedResponse, actualResponse);
   }
 }
