@@ -9,6 +9,7 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import timekeeper.absences.exceptions.AlreadyApprovedException;
 import timekeeper.absences.models.Absence;
 import timekeeper.absences.models.AbsenceEvent;
 import timekeeper.absences.models.AbsenceType;
@@ -55,6 +56,12 @@ public class AbsenceServiceImpl implements AbsenceService {
   public Optional<Absence> approveAbsence(long absenceId, long approverId) {
     Optional<Absence> absenceToApprove = absenceRepository.findById(absenceId);
     if (!absenceToApprove.isPresent()) return absenceToApprove;
+    if (absenceToApprove
+        .get()
+        .getAbsenceEvents()
+        .stream()
+        .anyMatch(o -> o.getEventType().equals(EventType.APPROVE)))
+      throw new AlreadyApprovedException("Absence with id " + absenceId + " is already approved");
     absenceToApprove
         .get()
         .getAbsenceEvents()

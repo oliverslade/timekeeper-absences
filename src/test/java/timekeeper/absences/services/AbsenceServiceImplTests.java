@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import timekeeper.absences.exceptions.AlreadyApprovedException;
 import timekeeper.absences.models.Absence;
 import timekeeper.absences.models.AbsenceEvent;
 import timekeeper.absences.models.EventType;
@@ -127,25 +128,12 @@ public class AbsenceServiceImplTests {
   public void approveAbsence_successful() {
     Absence expectedAbsence = getDefaultAbsence(0, LocalDate.now().toDateTimeAtStartOfDay());
 
-    Absence updatedAbsence =
-        new Absence(
-            expectedAbsence.getAbsenceId(),
-            expectedAbsence.getUserId(),
-            expectedAbsence.getAbsenceType(),
-            expectedAbsence.getStartDate(),
-            expectedAbsence.getEndDate(),
-            expectedAbsence.getDescription(),
-            expectedAbsence.getAbsenceEvents());
-    updatedAbsence
-        .getAbsenceEvents()
-        .add(new AbsenceEvent((long) 0, DateTime.now(), (long) 1234, EventType.APPROVE));
-
     when(mockAbsenceRepository.findById(expectedAbsence.getAbsenceId()))
         .thenReturn(Optional.of(expectedAbsence));
-    when(mockAbsenceRepository.save(any())).thenReturn(updatedAbsence);
+    when(mockAbsenceRepository.save(any())).thenReturn(expectedAbsence);
 
     Absence actualAbsence =
-        absenceServiceImpl.approveAbsence(expectedAbsence.getAbsenceId(), (long) 1234).get();
+        absenceServiceImpl.approveAbsence(expectedAbsence.getAbsenceId(), 1234).get();
 
     assertEquals(expectedAbsence, actualAbsence);
   }
@@ -159,6 +147,20 @@ public class AbsenceServiceImplTests {
     Optional<Absence> actualAbsence = absenceServiceImpl.approveAbsence(absenceId, approverId);
 
     assertEquals(Optional.empty(), actualAbsence);
+  }
+
+  @Test(expected = AlreadyApprovedException.class)
+  public void approveAbsence_alreadyApproved() {
+    long absenceId = 123;
+    long approverId = 321;
+    Absence absenceToApprove = getDefaultAbsence(123L, DateTime.now().minusMonths(1));
+    absenceToApprove
+        .getAbsenceEvents()
+        .add(new AbsenceEvent(0L, DateTime.now().minusDays(10), approverId, EventType.APPROVE));
+
+    when(mockAbsenceRepository.findById(absenceId)).thenReturn(Optional.of(absenceToApprove));
+
+    absenceServiceImpl.approveAbsence(absenceId, approverId);
   }
 
   @Test

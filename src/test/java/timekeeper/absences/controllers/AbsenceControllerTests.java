@@ -19,7 +19,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.server.ResponseStatusException;
+import timekeeper.absences.exceptions.AlreadyApprovedException;
 import timekeeper.absences.models.Absence;
+import timekeeper.absences.models.AbsenceEvent;
+import timekeeper.absences.models.EventType;
 import timekeeper.absences.services.contracts.AbsenceService;
 import timekeeper.absences.services.impls.AbsenceServiceImpl;
 import timekeeper.absences.utils.TestUtils;
@@ -47,8 +50,7 @@ public class AbsenceControllerTests {
     when(mockService.getAbsenceDetails(expectedAbsence.getAbsenceId()))
         .thenReturn(Optional.of(expectedAbsence));
 
-    ResponseEntity<Absence> actualResponse =
-        controller.getAbsencesDetails(expectedAbsence.getAbsenceId());
+    ResponseEntity actualResponse = controller.getAbsencesDetails(expectedAbsence.getAbsenceId());
 
     assertEquals(expectedResponse, actualResponse);
   }
@@ -219,7 +221,7 @@ public class AbsenceControllerTests {
   @Test(expected = ResponseStatusException.class)
   public void createAbsence_internalServerError() {
     Absence existingAbsence = TestUtils.getDefaultAbsence(123L, DateTime.now());
-    ResponseEntity expectedResponse = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    ResponseEntity expectedResponse = new ResponseEntity<>("something broke", HttpStatus.INTERNAL_SERVER_ERROR);
 
     when(mockService.getAbsencesForPeriod(
             existingAbsence.getStartDate(),
@@ -234,6 +236,64 @@ public class AbsenceControllerTests {
             existingAbsence.getStartDate(),
             existingAbsence.getEndDate(),
             existingAbsence.getDescription());
+
+    assertEquals(expectedResponse, actualResponse);
+  }
+
+  @Test
+  public void approveAbsence_successful() {
+    long absenceId = 123;
+    long approverId = 321;
+    Absence expectedAbsence = TestUtils.getDefaultAbsence(123L, DateTime.now().minusMonths(1));
+    expectedAbsence
+        .getAbsenceEvents()
+        .add(new AbsenceEvent(0L, DateTime.now(), approverId, EventType.APPROVE));
+
+    ResponseEntity expectedResponse = new ResponseEntity<>(expectedAbsence, HttpStatus.OK);
+
+    when(mockService.approveAbsence(absenceId, approverId))
+        .thenReturn(Optional.of(expectedAbsence));
+
+    ResponseEntity actualResponse = controller.approveAbsence(absenceId, approverId);
+
+    assertEquals(expectedResponse, actualResponse);
+  }
+
+  @Test
+  public void approveAbsence_notFound() {
+    long absenceId = 123;
+    long approverId = 321;
+    ResponseEntity expectedResponse = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+    ResponseEntity actualResponse = controller.approveAbsence(absenceId, approverId);
+
+    assertEquals(expectedResponse, actualResponse);
+  }
+
+  @Test(expected = ResponseStatusException.class)
+  public void approveAbsence_alreadyApproved() {
+    long absenceId = 123;
+    long approverId = 321;
+    ResponseEntity expectedResponse = new ResponseEntity<>("already approved", HttpStatus.CONFLICT);
+
+    when(mockService.approveAbsence(absenceId, approverId))
+        .thenThrow(new AlreadyApprovedException("already approved"));
+
+    ResponseEntity actualResponse = controller.approveAbsence(absenceId, approverId);
+
+    assertEquals(expectedResponse, actualResponse);
+  }
+
+  @Test(expected = ResponseStatusException.class)
+  public void approveAbsence_internalServerError() {
+    long absenceId = 123;
+    long approverId = 321;
+    ResponseEntity expectedResponse = new ResponseEntity<>("something broke", HttpStatus.INTERNAL_SERVER_ERROR);
+
+    when(mockService.approveAbsence(absenceId, approverId))
+            .thenThrow(new RuntimeException("something broke"));
+
+    ResponseEntity actualResponse = controller.approveAbsence(absenceId, approverId);
 
     assertEquals(expectedResponse, actualResponse);
   }
