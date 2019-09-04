@@ -1,4 +1,4 @@
-package timekeeper.absences.controllers;
+package timekeeper.absences.api.controllers;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -6,22 +6,20 @@ import java.util.List;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import timekeeper.absences.api.docs.AbsenceControllerDocs;
 import timekeeper.absences.exceptions.AlreadyApprovedException;
 import timekeeper.absences.models.Absence;
 import timekeeper.absences.models.AbsenceType;
 import timekeeper.absences.services.contracts.AbsenceService;
 
 @RestController
-public class AbsenceController {
+public class AbsenceController implements AbsenceControllerDocs {
 
   @Autowired AbsenceService absenceService;
 
-  @GetMapping("/get-absences-by-user")
+  @Override
   public ResponseEntity getAllAbsencesByUser(long userId) {
     try {
       return new ResponseEntity<>(absenceService.getAllAbsencesByUser(userId), OK);
@@ -30,7 +28,7 @@ public class AbsenceController {
     }
   }
 
-  @GetMapping("/get-absences-details")
+  @Override
   public ResponseEntity getAbsencesDetails(long absenceId) {
     try {
       return absenceService
@@ -42,7 +40,7 @@ public class AbsenceController {
     }
   }
 
-  @GetMapping("/get-absences-for-period")
+  @Override
   public ResponseEntity getAbsencesForPeriod(
       LocalDate startOfPeriod, LocalDate endOfPeriod, long userId) {
     try {
@@ -53,7 +51,7 @@ public class AbsenceController {
     }
   }
 
-  @PostMapping("/create-absence")
+  @Override
   public ResponseEntity<Absence> createAbsence(
       long userId, AbsenceType type, LocalDate startDate, LocalDate endDate, String description) {
     try {
@@ -66,7 +64,7 @@ public class AbsenceController {
     }
   }
 
-  @PutMapping("/approve-absence")
+  @Override
   public ResponseEntity approveAbsence(long absenceId, long approverId) {
     try {
       return absenceService
@@ -80,7 +78,7 @@ public class AbsenceController {
     }
   }
 
-  @PutMapping("/update-absence")
+  @Override
   public ResponseEntity updateAbsence(
       long absenceId, LocalDate startDate, LocalDate endDate, String description) {
     try {
