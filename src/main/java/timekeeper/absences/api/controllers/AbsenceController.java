@@ -4,7 +4,6 @@ import static org.springframework.http.HttpStatus.*;
 
 import java.util.List;
 import org.joda.time.LocalDate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -17,7 +16,11 @@ import timekeeper.absences.services.contracts.AbsenceService;
 @RestController
 public class AbsenceController implements AbsenceControllerDocs {
 
-  @Autowired AbsenceService absenceService;
+  private final AbsenceService absenceService;
+
+  public AbsenceController(AbsenceService absenceService) {
+    this.absenceService = absenceService;
+  }
 
   @Override
   public ResponseEntity getAllAbsencesByUser(long userId) {
@@ -89,14 +92,5 @@ public class AbsenceController implements AbsenceControllerDocs {
     } catch (Exception e) {
       throw new ResponseStatusException(INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
     }
-  }
-
-  /**
-   * This setter method should be used only by unit tests.
-   *
-   * @param absenceService
-   */
-  public void setService(AbsenceService absenceService) {
-    this.absenceService = absenceService;
   }
 }

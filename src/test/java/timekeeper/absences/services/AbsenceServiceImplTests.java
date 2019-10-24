@@ -34,10 +34,8 @@ public class AbsenceServiceImplTests {
 
   @Before
   public void setUp() {
-    absenceServiceImpl = new AbsenceServiceImpl();
-
     mockAbsenceRepository = mock(AbsenceRepository.class);
-    absenceServiceImpl.setAbsenceRepository(mockAbsenceRepository);
+    absenceServiceImpl = new AbsenceServiceImpl(mockAbsenceRepository);
   }
 
   @Test

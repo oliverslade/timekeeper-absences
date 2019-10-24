@@ -37,9 +37,8 @@ public class AbsenceControllerTests {
 
   @Before
   public void setUp() {
-    controller = new AbsenceController();
     mockService = mock(AbsenceServiceImpl.class);
-    controller.setService(mockService);
+    controller = new AbsenceController(mockService);
   }
 
   @Test
