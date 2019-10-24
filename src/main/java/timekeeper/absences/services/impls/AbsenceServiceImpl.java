@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import timekeeper.absences.exceptions.AlreadyApprovedException;
 import timekeeper.absences.models.Absence;
@@ -21,6 +22,7 @@ public class AbsenceServiceImpl implements AbsenceService {
 
   private final AbsenceRepository absenceRepository;
 
+  @Autowired
   public AbsenceServiceImpl(AbsenceRepository absenceRepository) {
     this.absenceRepository = absenceRepository;
   }

@@ -4,6 +4,7 @@ import static org.springframework.http.HttpStatus.*;
 
 import java.util.List;
 import org.joda.time.LocalDate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,6 +19,7 @@ public class AbsenceController implements AbsenceControllerDocs {
 
   private final AbsenceService absenceService;
 
+  @Autowired
   public AbsenceController(AbsenceService absenceService) {
     this.absenceService = absenceService;
   }
