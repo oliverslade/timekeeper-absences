@@ -14,16 +14,18 @@ import timekeeper.absences.models.Absence;
 import timekeeper.absences.models.AbsenceEvent;
 import timekeeper.absences.models.AbsenceType;
 import timekeeper.absences.models.EventType;
-import timekeeper.absences.repositories.AbsenceEventRepository;
 import timekeeper.absences.repositories.AbsenceRepository;
 import timekeeper.absences.services.contracts.AbsenceService;
 
 @Service
 public class AbsenceServiceImpl implements AbsenceService {
 
-  @Autowired AbsenceRepository absenceRepository;
+  private final AbsenceRepository absenceRepository;
 
-  @Autowired AbsenceEventRepository eventRepository;
+  @Autowired
+  public AbsenceServiceImpl(AbsenceRepository absenceRepository) {
+    this.absenceRepository = absenceRepository;
+  }
 
   @Override
   public List getAllAbsencesByUser(long userId) {
@@ -55,7 +57,7 @@ public class AbsenceServiceImpl implements AbsenceService {
   @Override
   public Optional<Absence> approveAbsence(long absenceId, long approverId) {
     Optional<Absence> absenceToApprove = absenceRepository.findById(absenceId);
-    if (!absenceToApprove.isPresent()) return absenceToApprove;
+    if (absenceToApprove.isEmpty()) return absenceToApprove;
     if (absenceToApprove
         .get()
         .getAbsenceEvents()
@@ -74,7 +76,7 @@ public class AbsenceServiceImpl implements AbsenceService {
       long absenceId, LocalDate startDate, LocalDate endDate, String description) {
     Optional<Absence> absenceToUpdate = absenceRepository.findById(absenceId);
 
-    if (!absenceToUpdate.isPresent()) return absenceToUpdate;
+    if (absenceToUpdate.isEmpty()) return absenceToUpdate;
     Absence confirmedAbsence = absenceToUpdate.get();
 
     confirmedAbsence.setStartDate(startDate);
@@ -82,14 +84,5 @@ public class AbsenceServiceImpl implements AbsenceService {
     confirmedAbsence.setDescription(description);
 
     return Optional.of(absenceRepository.save(confirmedAbsence));
-  }
-
-  /**
-   * This setter method should be used only by unit tests.
-   *
-   * @param absenceRepository
-   */
-  public void setAbsenceRepository(AbsenceRepository absenceRepository) {
-    this.absenceRepository = absenceRepository;
   }
 }

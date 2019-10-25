@@ -17,7 +17,12 @@ import timekeeper.absences.services.contracts.AbsenceService;
 @RestController
 public class AbsenceController implements AbsenceControllerDocs {
 
-  @Autowired AbsenceService absenceService;
+  private final AbsenceService absenceService;
+
+  @Autowired
+  public AbsenceController(AbsenceService absenceService) {
+    this.absenceService = absenceService;
+  }
 
   @Override
   public ResponseEntity getAllAbsencesByUser(long userId) {
@@ -89,14 +94,5 @@ public class AbsenceController implements AbsenceControllerDocs {
     } catch (Exception e) {
       throw new ResponseStatusException(INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
     }
-  }
-
-  /**
-   * This setter method should be used only by unit tests.
-   *
-   * @param absenceService
-   */
-  public void setService(AbsenceService absenceService) {
-    this.absenceService = absenceService;
   }
 }
